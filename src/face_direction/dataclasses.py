@@ -4,7 +4,7 @@ from dataclasses import dataclass
 class Direction:
     yaw: float
     pitch: float
-    yaw_threshold: int = 20
+    yaw_threshold: int = 35
     pitch_threshold: int = 20
     value: list = None  # Will be calculated upon initialization
 
