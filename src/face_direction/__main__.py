@@ -1,6 +1,6 @@
 import argparse
 from .face_orienter import FaceOrienter
-
+from .dataclasses import Direction
 
 def main():
     parser = argparse.ArgumentParser(description="Extract frames from a video file.")
@@ -10,7 +10,10 @@ def main():
 
     face = FaceOrienter()
     yaw, pitch, roll = face.orient(args.input_file, args.show)
-    print(f"Yaw: {yaw:.2f} degrees, Pitch: {pitch:.2f} degrees, Roll: {roll:.2f} degrees")
+
+    d = Direction(yaw, pitch)
+
+    d.print_direction()
 
 if __name__ == "__main__":
     main()
