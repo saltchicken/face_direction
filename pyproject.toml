@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "face_direction"
+version = "0.1.1"
+dependencies = [
+]
+
+[project.scripts]
+face_direction = "face_direction.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
