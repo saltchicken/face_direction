@@ -29,6 +29,47 @@ class FaceOrienter:
             y = int(landmarks.landmark[index].y * frame.shape[0])
             cv2.circle(frame, (x, y), 2, (0, 255, 0), -1)  # Draw a small green circle for each selected landmark
 
+    def get_yaw_pitch_roll(self, rotation_vector):
+        # Convert the rotation vector to a rotation matrix
+        rotation_matrix, _ = cv2.Rodrigues(rotation_vector)
+
+        # Extract the Euler angles from the rotation matrix
+        pitch = np.arctan2(rotation_matrix[2, 1], rotation_matrix[2, 2])  # Rotation around X-axis (pitch)
+        yaw = np.arctan2(-rotation_matrix[2, 0], np.sqrt(rotation_matrix[2, 1] ** 2 + rotation_matrix[2, 2] ** 2))  # Rotation around Y-axis (yaw)
+        roll = np.arctan2(rotation_matrix[1, 0], rotation_matrix[0, 0])  # Rotation around Z-axis (roll)
+
+        # Convert from radians to degrees
+        pitch = np.degrees(pitch)
+        yaw = np.degrees(yaw)
+        roll = np.degrees(roll)
+
+        return yaw, pitch, roll
+
+    def visualize_rotation_vector(self, frame, rotation_vector, translation_vector, camera_matrix, dist_coeffs, image_points):
+        # Define the 3D axis (length of 100)
+        axis_length = 100.0
+        axis_points_3D = np.array([
+            (axis_length, 0, 0),  # X-axis (Red)
+            (0, axis_length, 0),  # Y-axis (Green)
+            (0, 0, axis_length)   # Z-axis (Blue)
+        ], dtype="double")
+
+        # Project 3D points to the image plane
+        projected_points, _ = cv2.projectPoints(axis_points_3D, rotation_vector, translation_vector, camera_matrix, dist_coeffs)
+
+        # Get the nose tip as the origin
+        nose_tip = tuple(map(int, image_points[0]))  # The first point in image_points is the nose tip
+
+        # Convert projected points to tuples
+        x_axis = tuple(map(int, projected_points[0].ravel()))
+        y_axis = tuple(map(int, projected_points[1].ravel()))
+        z_axis = tuple(map(int, projected_points[2].ravel()))
+
+        # Draw the 3D coordinate axes
+        cv2.line(frame, nose_tip, x_axis, (0, 0, 255), 3)  # X-axis in Red
+        cv2.line(frame, nose_tip, y_axis, (0, 255, 0), 3)  # Y-axis in Green
+        cv2.line(frame, nose_tip, z_axis, (255, 0, 0), 3)  # Z-axis in Blue
+
     def orient(self, image_path):
         # Read the image
         frame = cv2.imread(image_path)
@@ -77,7 +118,11 @@ class FaceOrienter:
                 dist_coeffs = np.zeros((4, 1))  # Assuming no lens distortion
                 (success, rotation_vector, translation_vector) = cv2.solvePnP(model_points, image_points, camera_matrix,
                                                                               dist_coeffs)
+                self.visualize_rotation_vector(frame, rotation_vector, translation_vector, camera_matrix, dist_coeffs,image_points)
 
+                print(f"Rotation Vector: {rotation_vector}")
+                yaw, pitch, roll = self.get_yaw_pitch_roll(rotation_vector)
+                print(f"Yaw: {yaw:.2f} degrees, Pitch: {pitch:.2f} degrees, Roll: {roll:.2f} degrees")
                 # Projection of points to 2D
                 projection_points = []
                 for point in [
@@ -115,5 +160,5 @@ class FaceOrienter:
 
 if __name__ == '__main__':
     face = FaceOrienter()
-    face.orient("/home/saltchicken/Desktop/uf329734a_f_2407.jpg")  # Replace with your image path
+    face.orient("/home/saltchicken/Desktop/delete4.jpg")  # Replace with your image path
 
