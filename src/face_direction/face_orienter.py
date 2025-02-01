@@ -69,7 +69,7 @@ class FaceOrienter:
         cv2.line(frame, nose_tip, y_axis, (0, 255, 0), 3)  # Y-axis in Green
         cv2.line(frame, nose_tip, z_axis, (255, 0, 0), 3)  # Z-axis in Blue
 
-    def orient(self, image_path):
+    def orient(self, image_path, show=False):
         # Read the image
         frame = cv2.imread(image_path)
         if frame is None:
@@ -117,42 +117,47 @@ class FaceOrienter:
                 dist_coeffs = np.zeros((4, 1))  # Assuming no lens distortion
                 (success, rotation_vector, translation_vector) = cv2.solvePnP(model_points, image_points, camera_matrix,
                                                                               dist_coeffs)
-                self.visualize_rotation_vector(frame, rotation_vector, translation_vector, camera_matrix, dist_coeffs,image_points)
 
-                print(f"Rotation Vector: {rotation_vector}")
+
+                # print(f"Rotation Vector: {rotation_vector}")
                 yaw, pitch, roll = self.get_yaw_pitch_roll(rotation_vector)
-                print(f"Yaw: {yaw:.2f} degrees, Pitch: {pitch:.2f} degrees, Roll: {roll:.2f} degrees")
                 # Projection of points to 2D
-                projection_points = []
-                for point in [
-                    (350.0, 270.0, 0.0), (-350.0, -270.0, 0.0),
-                    (-350.0, 270.0, 0.0), (350.0, -270.0, 0.0),
-                    (450.0, 350.0, 400.0), (-450.0, -350.0, 400.0),
-                    (-450.0, 350.0, 400.0), (450.0, -350.0, 400.0)
-                ]:
-                    (proj_point, _) = cv2.projectPoints(np.array([point]), rotation_vector, translation_vector,
-                                                       camera_matrix, dist_coeffs)
-                    projection_points.append((int(proj_point[0][0][0]), int(proj_point[0][0][1])))
+                if show:
+                    self.visualize_rotation_vector(frame, rotation_vector, translation_vector, camera_matrix, dist_coeffs,image_points)
+                    projection_points = []
+                    for point in [
+                        (350.0, 270.0, 0.0), (-350.0, -270.0, 0.0),
+                        (-350.0, 270.0, 0.0), (350.0, -270.0, 0.0),
+                        (450.0, 350.0, 400.0), (-450.0, -350.0, 400.0),
+                        (-450.0, 350.0, 400.0), (450.0, -350.0, 400.0)
+                    ]:
+                        (proj_point, _) = cv2.projectPoints(np.array([point]), rotation_vector, translation_vector,
+                                                        camera_matrix, dist_coeffs)
+                        projection_points.append((int(proj_point[0][0][0]), int(proj_point[0][0][1])))
 
-                # Draw the projected lines
-                self.draw_line(frame, projection_points[0], projection_points[2])
-                self.draw_line(frame, projection_points[2], projection_points[1])
-                self.draw_line(frame, projection_points[1], projection_points[3])
-                self.draw_line(frame, projection_points[3], projection_points[0])
+                    # Draw the projected lines
+                    self.draw_line(frame, projection_points[0], projection_points[2])
+                    self.draw_line(frame, projection_points[2], projection_points[1])
+                    self.draw_line(frame, projection_points[1], projection_points[3])
+                    self.draw_line(frame, projection_points[3], projection_points[0])
 
-                self.draw_line(frame, projection_points[4], projection_points[6])
-                self.draw_line(frame, projection_points[6], projection_points[5])
-                self.draw_line(frame, projection_points[5], projection_points[7])
-                self.draw_line(frame, projection_points[7], projection_points[4])
+                    self.draw_line(frame, projection_points[4], projection_points[6])
+                    self.draw_line(frame, projection_points[6], projection_points[5])
+                    self.draw_line(frame, projection_points[5], projection_points[7])
+                    self.draw_line(frame, projection_points[7], projection_points[4])
 
-                # Draw the connecting lines between 3D model points and projections
-                self.draw_line(frame, projection_points[4], projection_points[0], color=(0, 255, 0))
-                self.draw_line(frame, projection_points[6], projection_points[2], color=(0, 255, 0))
-                self.draw_line(frame, projection_points[5], projection_points[1], color=(0, 255, 0))
-                self.draw_line(frame, projection_points[7], projection_points[3], color=(0, 255, 0))
+                    # Draw the connecting lines between 3D model points and projections
+                    self.draw_line(frame, projection_points[4], projection_points[0], color=(0, 255, 0))
+                    self.draw_line(frame, projection_points[6], projection_points[2], color=(0, 255, 0))
+                    self.draw_line(frame, projection_points[5], projection_points[1], color=(0, 255, 0))
+                    self.draw_line(frame, projection_points[7], projection_points[3], color=(0, 255, 0))
+
 
         # Display the image with the drawn lines and landmarks
-        cv2.imshow("Image with Selected Landmarks", frame)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+                    cv2.imshow("Image with Selected Landmarks", frame)
+                    cv2.waitKey(0)
+                    cv2.destroyAllWindows()
+
+                return yaw, pitch, roll
+
 
