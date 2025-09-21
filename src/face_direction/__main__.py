@@ -1,15 +1,9 @@
 import argparse
-import os
-import sys
-
 from .face_orienter import FaceOrienter
 from .dataclasses import Direction
 
 def main():
     """Main function to run the face direction detection."""
-
-    sys.stderr = open(os.devnull, 'w')
-
     parser = argparse.ArgumentParser(description="Analyze face direction from an image file.")
     parser.add_argument("input_file", help="Path to the input image file")
     parser.add_argument("--show", action="store_true", help="Show the visualization on the image")
@@ -17,8 +11,6 @@ def main():
 
     face_orienter = FaceOrienter()
     yaw, pitch, roll = face_orienter.orient(args.input_file, args.show)
-
-    sys.stderr = sys.__stderr__
 
     if yaw is not None and pitch is not None:
         face_direction = Direction(yaw, pitch)
