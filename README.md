@@ -17,10 +17,11 @@ A Python package to detect and analyze a person's face direction (yaw, pitch, an
 
 You can install `face_direction` directly from this repository.
 
- **Install the package:**
-    ```sh
+**Install the package:**
+    
+```sh
     pip install git+https://github.com/saltchicken/face_direction
-    ```
+```
     This command will install the package and its dependencies, including `opencv-python` and `mediapipe`.
 
 ---
