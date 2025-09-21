@@ -56,9 +56,5 @@ from face_direction.face_orienter import FaceOrienter
 face_orienter = FaceOrienter()
 
 # Analyze an image
-yaw, pitch, roll = face_orienter.orient("path/to/your/image.jpg", show=True)
-
-if yaw is not None:
-    print(f"Yaw: {yaw:.2f} degrees")
-    print(f"Pitch: {pitch:.2f} degrees")
-    print(f"Roll: {roll:.2f} degrees")
+face_direction = face_orienter.direction("/home/saltchicken/Pictures/mpv-shot0001.jpg")
+print(f"Direction: {face_direction}")
