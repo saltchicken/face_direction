@@ -22,7 +22,8 @@ You can install `face_direction` directly from this repository.
 ```sh
     pip install git+https://github.com/saltchicken/face_direction
 ```
-    This command will install the package and its dependencies, including `opencv-python` and `mediapipe`.
+    
+This command will install the package and its dependencies, including `opencv-python` and `mediapipe`.
 
 ---
 
