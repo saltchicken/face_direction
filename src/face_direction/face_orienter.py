@@ -33,10 +33,10 @@ class FaceOrienter:
         ], dtype="double")
         return camera_matrix
 
-    def orient(self, image_path, show=False):
-        frame = cv2.imread(image_path)
+    def orient(self, frame: np.ndarray, show=False):
+        """Analyzes a face from a NumPy array and returns yaw, pitch, and roll angles."""
         if frame is None:
-            print(f"Error: Unable to load image {image_path}")
+            print("Error: Input frame is None.")
             return None, None, None
 
         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -57,8 +57,8 @@ class FaceOrienter:
 
         # 3D model points are based on a generic head model
         model_points = np.array([
-            (0.0, 0.0, 0.0),         # Nose tip
-            (0.0, -330.0, -65.0),    # Chin
+            (0.0, 0.0, 0.0),      # Nose tip
+            (0.0, -330.0, -65.0), # Chin
             (-225.0, 170.0, -135.0), # Left eye left corner
             (225.0, 170.0, -135.0),  # Right eye right corner
             (-150.0, -150.0, -125.0),# Left mouth corner
@@ -80,14 +80,13 @@ class FaceOrienter:
         
         if show:
             visualize_rotation_vector(frame, rotation_vector, translation_vector, 
-                                      camera_matrix, dist_coeffs, image_points)
+                                     camera_matrix, dist_coeffs, image_points)
             cv2.imshow("Face Direction", frame)
             cv2.waitKey(0)
             cv2.destroyAllWindows()
 
         return yaw, pitch, roll
 
-    def direction(self, image_path, show=False):
-        yaw, pitch, roll = self.orient(image_path, show)
+    def direction(self, frame: np.ndarray, show=False):
+        yaw, pitch, roll = self.orient(frame, show)
         return Direction(yaw, pitch)
-
