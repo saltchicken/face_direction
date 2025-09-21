@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "face_direction"
 version = "0.1.1"
 dependencies = [
-  "python-opencv",
+  "opencv-python",
   "mediapipe"
 ]
 
