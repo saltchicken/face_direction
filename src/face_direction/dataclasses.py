@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 @dataclass
 class Direction:
@@ -6,60 +6,38 @@ class Direction:
     pitch: float
     yaw_threshold: int = 20
     pitch_threshold: int = 20
-    value: list = None  # Will be calculated upon initialization
+    value: list = field(init=False, default_factory=lambda: [0, 0])
 
     def __post_init__(self):
-        self.value = [0, 0]  # Default to straight values
-        self.calculate_direction()
+        self._calculate_direction()
 
-    def calculate_direction(self) -> None:
-        # Calculate x based on yaw
+    def _calculate_direction(self) -> None:
         if self.yaw > self.yaw_threshold:
-            self.value[0] = 1  # Right
+            self.value[0] = 1
         elif self.yaw < -self.yaw_threshold:
-            self.value[0] = -1  # Left
+            self.value[0] = -1
 
-        # Calculate y based on pitch
         if self.pitch > self.pitch_threshold:
-            self.value[1] = -1  # Up
+            self.value[1] = 1 # Down
         elif self.pitch < -self.pitch_threshold:
-            self.value[1] = 1  # Down
+            self.value[1] = -1 # Up
 
     @property
     def x(self) -> int:
         return self.value[0]
 
-    @x.setter
-    def x(self, new_x: int) -> None:
-        self.value[0] = new_x
-
     @property
     def y(self) -> int:
         return self.value[1]
-
-    @y.setter
-    def y(self, new_y: int) -> None:
-        self.value[1] = new_y
-
+    
     def __str__(self) -> str:
-        horizontal = { -1: "Left", 0: "Straight", 1: "Right" }
-        vertical = { -1: "Down", 0: "Straight", 1: "Up" }
+        horizontal_map = {-1: "Left", 0: "Straight", 1: "Right"}
+        vertical_map = {-1: "Up", 0: "Straight", 1: "Down"}
 
-        h_dir = horizontal.get(self.value[0], "Invalid")
-        v_dir = vertical.get(self.value[1], "Invalid")
+        h_dir = horizontal_map.get(self.x, "Invalid")
+        v_dir = vertical_map.get(self.y, "Invalid")
 
         if h_dir == "Straight" and v_dir == "Straight":
             return "Straight"
-        elif h_dir == "Straight":
-            return f"Straight {v_dir.lower()}"
-        elif v_dir == "Straight":
-            return f"{h_dir} straight"
-        else:
-            return f"{h_dir} {v_dir.lower()}"
-
-    def print_direction(self) -> None:
-        print(str(self))
-    
-    def print_yaw_pitch(self) -> None:
-        print(f"Yaw: {self.yaw:.2f} degrees, Pitch: {self.pitch:.2f} degrees")
-
+        
+        return f"{h_dir if h_dir != 'Straight' else ''} {v_dir if v_dir != 'Straight' else ''}".strip().lower()
