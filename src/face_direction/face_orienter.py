@@ -3,6 +3,7 @@ import mediapipe as mp
 import numpy as np
 
 from .utils import get_yaw_pitch_roll, visualize_rotation_vector, plot_selected_landmarks
+from .dataclasses import Direction
 
 class FaceOrienter:
     def __init__(self):
@@ -85,3 +86,8 @@ class FaceOrienter:
             cv2.destroyAllWindows()
 
         return yaw, pitch, roll
+
+    def direction(self, image_path, show=False):
+        yaw, pitch, roll = self.orient(image_path, show)
+        return Direction(yaw, pitch)
+
